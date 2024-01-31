@@ -8,12 +8,12 @@
   <body>
     <a-scene mindar-face embedded vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
       <a-camera active="false" position="0 0 0"></a-camera>
-      <a-light type="point" color="white" position="0 1 0" intensity="3"></a-light>
+      <a-light type="ambient" intensity="1.0"></a-light>
       <a-assets>
         <a-asset-item id="JV" src = "./assets/JV_AR.glb"></a-asset-item>
       </a-assets>
       <a-entity mindar-face-target="anchorIndex: 1">
-        <a-gltf-model rotation="0 0 0" position="0 0 0" scale="10 10 10" src="#JV"></a-gltf-model>
+        <a-gltf-model rotation="0 0 0" position="0 0 0" scale="8 8 8" src="#JV"></a-gltf-model>
       </a-entity>   
     </a-scene>
   </body>
