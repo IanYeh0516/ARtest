@@ -10,12 +10,11 @@
   <body>
     <a-scene mindar-face embedded vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
       <a-camera active="false" position="0 0 0"></a-camera>
-      <a-light type="ambient" intensity="1.0"></a-light>
       <a-assets>
         <a-asset-item id="animation_test" src = "./assets/Animation_test.glb"></a-asset-item>
       </a-assets>
       <a-entity mindar-face-target="anchorIndex: 1">
-        <a-gltf-model rotation="0 0 0" position="0 0.25 -0.6" scale="1 1 1" src="#animation_test" animation-mixer="clip:Animation"></a-gltf-model>
+        <a-gltf-model rotation="0 0 0" position="0 0 0" scale="1 1 1" src="#animation_test" animation-mixer="clip:Animation"></a-gltf-model>
       </a-entity>   
     </a-scene>
   </body>
