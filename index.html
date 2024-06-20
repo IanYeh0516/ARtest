@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
+    <div class="container">
       <a-scene mindar-face embedded vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
         <a-camera active="false" position="0 0 0"></a-camera>
         <a-assets>
@@ -17,7 +18,6 @@
           <a-gltf-model rotation="0 0 0" position="0 0 0" scale="1 1 1" src="#animation_test" animation-mixer="clip:Animation"></a-gltf-model>
         </a-entity>   
       </a-scene>
-      <div class="container">
         <div class="button-container">
           <button class="button" onclick="window.location.href='./image-identify/imageidentify.html'">Go to Page</button>
           <button class="button">no action</button>
