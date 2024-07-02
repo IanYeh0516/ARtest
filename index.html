@@ -10,12 +10,17 @@
     <!--  如果要替換圖片，請替換掉.mind檔  -->>
     <a-scene mindar-image="imageTargetSrc: ./targets.mind;" renderer.gammaOutput=true  vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false" color-space="sRGB" renderer="colorManagement: true" >
       <a-assets>
-        <a-asset-item id="avatarModel" src="./assets/imageDemo.glb"></a-asset-item>
+        <a-asset-item id="JVhead" src="./assets/imageDemo.glb"></a-asset-item>
+        <a-asset-item id="treasureBox" src="./assets/treasureBox.glb"></a-asset-item>
+
       </a-assets>
       <a-camera position="0 0 0" look-controls="enabled: false" cursor="fuse: false; rayOrigin: mouse;" raycaster="far: ${customFields.libVersion}; objects: .clickable"></a-camera>
       <a-entity mindar-image-target="targetIndex: 0">
         <!-- 測試模型  -->>
-        <a-gltf-model id="example-model"  class="clickable" rotation="0 0 0 " position="0 0 0" scale="1 1 1" src="#avatarModel" animation-mixer></a-gltf-model>
+       
+        <a-gltf-model id="model-JVhead"  rotation="0 0 0 " position="0 0 0" scale="0 0 0" src="#JVhead" animation-mixer></a-gltf-model>
+        <a-gltf-model id="model-treasureBox"  class="clickable" rotation="0 0 0 " position="0 0 0" scale="1 1 1" src="#treasureBox" ></a-gltf-model>
+
         <a-text id="example-text" value="Click Me!!" position="0 -0.2 0 " scale="0.7 0.7 0.7" align ="center"></a-text>
         </a-entity>
         <!-- 燈光  -->>
