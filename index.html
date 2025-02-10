@@ -12,7 +12,15 @@
       <a-camera active="false" position="0 0 0"></a-camera>
       <a-assets>
         <a-asset-item id="animation_test" src = "./assets/Animation_test.glb"></a-asset-item>
+       <!-- 遮擋器模型-->>
+        <a-asset-item id="headModel" src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/face-tracking/assets/sparkar/headOccluder.glb"></a-asset-item>
+       <!-- 遮擋器模型-->>
       </a-assets>
+      <!-- 遮擋器-->>
+      <a-entity mindar-face-target="anchorIndex: 168">
+        <a-gltf-model mindar-face-occluder position="0 -0.3 0.15"rotation="0 0 0" scale="0.1 0.1 0.1" src="#headModel"></a-gltf-model>
+      </a-entity>   
+      <!-- 遮擋器-->>
       <a-entity mindar-face-target="anchorIndex: 1">
         <a-gltf-model rotation="0 0 0" position="0 0 0" scale="1 1 1" src="#animation_test" animation-mixer></a-gltf-model>
       </a-entity>   
