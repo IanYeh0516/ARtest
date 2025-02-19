@@ -1,0 +1,36 @@
+#screenshot-button {
+    position: absolute;
+    bottom: 10px; /* 離底10px */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50px;
+    height: 50px;
+    padding: 0;
+    background-image: url('assets/capture.svg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 1000;
+}
+
+#screenshot-button:hover {
+  background-color: rgba(0, 0, 0, 0.9);
+}
+
+
+#screenshot-button:active {
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+/* 長按錄影狀態 */
+#screenshot-button.recording {
+  background-color: red;
+}
+
+/* 停止錄影狀態 */
+#screenshot-button.stopped {
+  background-color: gray;
+}
