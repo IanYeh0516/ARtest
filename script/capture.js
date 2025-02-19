@@ -116,31 +116,69 @@ function getAframeScreenCapture(video,height,width) {
 }
 // 拍攝主要功能
 function captureScreenshot() {
-    const webcamvideo = document.querySelector("video");
-    const aframe = document.querySelector('a-scene');
-    const canvasWidth = webcamvideo.clientWidth;
-    const canvasHeight = webcamvideo.clientHeight;
-    const webcam =  getWebcamCapture(webcamvideo,canvasHeight,canvasWidth);
-    const aframescreen = getAframeScreenCapture(aframe,canvasHeight,canvasWidth);
-    // combine 
-    const mergedImage = mergeCanvases(webcam,aframescreen,canvasHeight,canvasWidth).toDataURL("image/png");
-    const filename = ""
-    downloadImage(mergedImage, generateFilename("photo"));;
+    const webcamVideo = document.querySelector("video");
+    const aframeScene = document.querySelector("a-scene");
+    if (!webcamVideo || !aframeScene) {
+        console.error("❌ 找不到 <video> 或 <a-scene>");
+        return;
+    }
+    const canvasWidth = webcamVideo.clientWidth;
+    const canvasHeight = webcamVideo.clientHeight;
+    // 擷取 Webcam 畫面
+    const webcamFrame = getWebcamCapture(webcamVideo, canvasHeight, canvasWidth);
+    if (!webcamFrame) {
+        console.error("❌ 無法擷取 Webcam 畫面");
+        return;
+    }
+    // 擷取 A-Frame 畫面
+    const aframeFrame = getAframeScreenCapture(aframeScene, canvasHeight, canvasWidth);
+    if (!aframeFrame) {
+        console.error("❌ 無法擷取 A-Frame 畫面");
+        return;
+    }
+    // 合併畫面
+    const mergedCanvas = mergeCanvases(webcamFrame, aframeFrame, canvasHeight, canvasWidth);
+    const mergedImage = mergedCanvas.toDataURL("image/png");
+    // 產生檔名
+    const filename = generateFilename("photo");
+    // **自動選擇「下載」或「分享」**
+    downloadOrShareImage(mergedImage, filename);
 }
 // 下載檔案
 
-function downloadImage(dataUrl, filename) {
-    const link = document.createElement("a");
-    link.href = dataUrl;
-    link.download = filename;
+function downloadOrShareImage(dataUrl, filename) {
+      // **檢查是否為行動裝置**
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
-    if (navigator.userAgent.includes("iPhone") || navigator.userAgent.includes("iPad")) {
-        window.open(dataUrl, "_blank"); // iOS 需要手動點擊下載
-    } else {
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
+      // **轉換成 Blob**
+      fetch(dataUrl)
+          .then(res => res.blob())
+          .then(blob => {
+              const file = new File([blob], filename, { type: "image/png" });
+  
+              // **📱 只有「行動裝置」才使用 Web Share API**
+              if (isMobile && navigator.share) {
+                  navigator.share({
+                      title: "分享截圖",
+                      text: "這是我的截圖，來看看吧！",
+                      files: [file]
+                  })
+                  .then(() => console.log("✅ 成功分享"))
+                  .catch(err => console.error("❌ 分享失敗:", err));
+              } 
+              // **💻 桌面版（Windows / macOS）強制下載**
+              else {
+                  const link = document.createElement("a");
+                  link.href = URL.createObjectURL(blob);
+                  link.download = filename;
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                  console.log("✅ 圖片已下載:", filename);
+              }
+          })
+          .catch(err => console.error("❌ 下載 / 分享圖片失敗:", err));
+  
 }
 // 整合照片 
 function mergeCanvases(baseFrame,topFrame,height,width){
