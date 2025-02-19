@@ -36,11 +36,6 @@ button.addEventListener('mouseleave', function () {
     button.classList.remove('recording'); // 避免錄影狀態卡住
     button.classList.add('active');
 });
-
-
-
-
-
 function startRecording() {
     // console.log(" 錄影開始 ");
     // const canvas = document.querySelector('canvas');
@@ -101,6 +96,7 @@ function getWebcamCapture(video,height,width) {
     ctx.drawImage(video, 0, 0, width, height);
     return canvas;
 }
+// aframe攝影機畫面擷取
 function getAframeScreenCapture(video,height,width) {
 
     if (!video) {
@@ -118,6 +114,7 @@ function getAframeScreenCapture(video,height,width) {
     ctx.drawImage(screenshotCanvas, 0, 0, width, height);
     return canvas;
 }
+// 拍攝主要功能
 function captureScreenshot() {
     const webcamvideo = document.querySelector("video");
     const aframe = document.querySelector('a-scene');
@@ -130,15 +127,22 @@ function captureScreenshot() {
     const filename = ""
     downloadImage(mergedImage, generateFilename("photo"));;
 }
+// 下載檔案
 
 function downloadImage(dataUrl, filename) {
     const link = document.createElement("a");
     link.href = dataUrl;
     link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+
+    if (navigator.userAgent.includes("iPhone") || navigator.userAgent.includes("iPad")) {
+        window.open(dataUrl, "_blank"); // iOS 需要手動點擊下載
+    } else {
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
 }
+// 整合照片 
 function mergeCanvases(baseFrame,topFrame,height,width){
     const canvas = document.createElement("canvas");
     canvas.width = width;
@@ -148,7 +152,7 @@ function mergeCanvases(baseFrame,topFrame,height,width){
     ctx.drawImage(topFrame, 0, 0, width, height);
     return canvas;
 }
-
+// fileName
 function generateFilename(sourceType = "photo") {
     // 拍照模式 or 錄影模式 
     // photo or recording
