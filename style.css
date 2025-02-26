@@ -13,6 +13,10 @@
     border: none;
     border-radius: 50%;
     cursor: pointer;
+    -webkit-user-select: none;  /* Chrome, Safari, Edge */
+    -moz-user-select: none;     /* Firefox */
+    -ms-user-select: none;      /* Internet Explorer 10+ */
+    user-select: none;          /* 標準語法 */
     z-index: 1000;
 }
 

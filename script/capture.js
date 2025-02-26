@@ -2,6 +2,7 @@ let mediaRecorder;
 let recordedChunks = [];
 let recordingTimeout;
 
+
 const button = document.getElementById('screenshot-button');
 
 // 按下滑鼠
@@ -15,12 +16,14 @@ button.addEventListener('mousedown', function () {
 //滑鼠釋放
 button.addEventListener('mouseup', function () {
     clearTimeout(recordingTimeout);
-    if (mediaRecorder && mediaRecorder.state === "recording") {
+    if (mediaRecorder && mediaRecorder.state == "recording") {
+        console.log("mediaRecorder : "+ mediaRecorder  + " mediaRecorder.state : " + mediaRecorder.state);
         stopRecording();
         button.classList.remove('recording');
         button.classList.add('active'); // 顯示錄影結束狀態
 
     } else {
+        console.log("captureshot")
         captureScreenshot();
         button.classList.remove('recording');
         button.classList.add('active'); // 單擊後觸發狀態
@@ -36,51 +39,83 @@ button.addEventListener('mouseleave', function () {
     button.classList.remove('recording'); // 避免錄影狀態卡住
     button.classList.add('active');
 });
-function startRecording() {
-    // console.log(" 錄影開始 ");
-    // const canvas = document.querySelector('canvas');
-    // if (!canvas) {
-    //     console.error("找不到 A-Frame 的 canvas");
-    //     return;
-    // }
 
-    // const stream = canvas.captureStream();
-    // recordedChunks = [];
+function startRecording(mimeType = "video/mp4") {
 
-    // const options = { mimeType: "video/mp4" };
-    // mediaRecorder = new MediaRecorder(stream, options);
+    console.log(" strart recording");
+    const webcamVideo = document.querySelector("video");
+    const canvasWidth = webcamVideo.clientWidth;
+    const canvasHeight = webcamVideo.clientHeight;
+    let combinedCanvas;
+    combinedCanvas = document.createElement("Canvas");
+    combinedCanvas.height =canvasHeight ;
+    combinedCanvas.width =canvasWidth ;
 
-    // mediaRecorder.ondataavailable = function(event) {
-    //     if (event.data.size > 0) {
-    //         recordedChunks.push(event.data);
-    //     }
+    const stream = combinedCanvas.captureStream(24);
+    mediaRecorder = new MediaRecorder(stream, { mimeType });
 
-    //     console.log("current states : "+ mediaRecorder.state); 
-    // };
+    mediaRecorder.ondataavailable = function (event) {
+        console.log("🎥 Data available:", event.data.size, "bytes");
+        if (event.data.size > 0) recordedChunks.push(event.data);
+    };
 
-    // mediaRecorder.onstop = function() {
-    //     const blob = new Blob(recordedChunks, { type: "video/mp4" });
-    //     const url = URL.createObjectURL(blob);
-    //     const a = document.createElement("a");
-    //     document.body.appendChild(a);
-    //     a.style.display = "none";
-    //     a.href = url;
-    //     a.download = "capture.mp4";
-    //     a.click();
-    //     window.URL.revokeObjectURL(url);
-    // };
+    mediaRecorder.onstop = function () {
+        console.log("🎬 MediaRecorder started" + " media type : " + mimeType);
 
-    // mediaRecorder.start();
-    // console.log("錄影已開始...");
+        const blob = new Blob(recordedChunks, { type: mimeType });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.style.display = "none";
+        a.href = url;
+        a.download = generateFilename("recording");
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+    };
+    // updated frame 
+    function drawFrame() {
+        console.log("Drawing frame...");
+        const ctx = combinedCanvas.getContext("2d");
+        if (!ctx) {
+            console.error("Canvas context could not be retrieved");
+            return;
+        }
+
+        const webcamFrame = getWebcamCapture(webcamVideo, combinedCanvas.height, combinedCanvas.width);
+        const aframeScene = document.querySelector("a-scene");
+        const aframeFrame = aframeScene ? getAframeScreenCapture(aframeScene, combinedCanvas.height, combinedCanvas.width) : null;
+
+        if (webcamFrame && aframeFrame) {
+            console.log("Frame captured - Webcam & A-Frame");
+            ctx.clearRect(0, 0, combinedCanvas.width, combinedCanvas.height);
+            ctx.drawImage(webcamFrame, 0, 0);
+            ctx.drawImage(aframeFrame, 0, 0);
+        } else {
+            console.warn("Frame capture failed");
+        }
+
+        if (mediaRecorder && mediaRecorder.state === "recording") {
+            requestAnimationFrame(drawFrame);
+        }
+    }
+
+    recordedChunks = [];
+    mediaRecorder.start();
+    drawFrame();
+    console.log("Recording started...");
+
 }
+
+
+
 // stop錄影
 function stopRecording() {
-    // if (mediaRecorder && mediaRecorder.state === "recording") {
-    //     mediaRecorder.stop();
-    //     console.log("錄影已停止...");
-    // }
+    if (mediaRecorder && mediaRecorder.state === "recording") {
+        mediaRecorder.stop();
+        console.log("錄影已停止...");
+    }
 }
-
 
 // 攝影機畫面擷取
 function getWebcamCapture(video,height,width) {
@@ -119,7 +154,7 @@ function captureScreenshot() {
     const webcamVideo = document.querySelector("video");
     const aframeScene = document.querySelector("a-scene");
     if (!webcamVideo || !aframeScene) {
-        console.error("❌ 找不到 <video> 或 <a-scene>");
+        console.error("找不到 <video> 或 <a-scene>");
         return;
     }
     const canvasWidth = webcamVideo.clientWidth;
@@ -127,13 +162,13 @@ function captureScreenshot() {
     // 擷取 Webcam 畫面
     const webcamFrame = getWebcamCapture(webcamVideo, canvasHeight, canvasWidth);
     if (!webcamFrame) {
-        console.error("❌ 無法擷取 Webcam 畫面");
+        console.error("無法擷取 Webcam 畫面");
         return;
     }
     // 擷取 A-Frame 畫面
     const aframeFrame = getAframeScreenCapture(aframeScene, canvasHeight, canvasWidth);
     if (!aframeFrame) {
-        console.error("❌ 無法擷取 A-Frame 畫面");
+        console.error("無法擷取 A-Frame 畫面");
         return;
     }
     // 合併畫面
@@ -163,8 +198,8 @@ function downloadOrShareImage(dataUrl, filename) {
                       text: "這是我的截圖，來看看吧！",
                       files: [file]
                   })
-                  .then(() => console.log("✅ 成功分享"))
-                  .catch(err => console.error("❌ 分享失敗:", err));
+                  .then(() => console.log("成功分享"))
+                  .catch(err => console.error("分享失敗:", err));
               } 
               // **💻 桌面版（Windows / macOS）強制下載**
               else {
@@ -174,10 +209,10 @@ function downloadOrShareImage(dataUrl, filename) {
                   document.body.appendChild(link);
                   link.click();
                   document.body.removeChild(link);
-                  console.log("✅ 圖片已下載:", filename);
+                  console.log("圖片已下載:", filename);
               }
           })
-          .catch(err => console.error("❌ 下載 / 分享圖片失敗:", err));
+          .catch(err => console.error("下載 / 分享圖片失敗:", err));
   
 }
 // 整合照片 
@@ -191,7 +226,7 @@ function mergeCanvases(baseFrame,topFrame,height,width){
     return canvas;
 }
 // fileName
-function generateFilename(sourceType = "photo") {
+function generateFilename(sourceType) {
     // 拍照模式 or 錄影模式 
     // photo or recording
     const now = new Date();
@@ -202,5 +237,6 @@ function generateFilename(sourceType = "photo") {
     const mm = String(now.getMinutes()).padStart(2, "0");
     const SS = String(now.getSeconds()).padStart(2, "0");
     //photo_20250219_143045.png
-    return `${sourceType}_${YYYY}${MM}${DD}_${HH}${mm}${SS}.png`;
+    const extension = sourceType === "recording" ? ".mp4" : "png";
+    return `${sourceType}_${YYYY}${MM}${DD}_${HH}${mm}${SS}.${extension}`;
 }
